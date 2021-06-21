@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OF.Infrastructure.Messaging", "OF.Infrastructure.Messaging\OF.Infrastructure.Messaging.csproj", "{A2C7A15C-FCFC-4F37-9F97-E119B7442927}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OF.Infrastructure.Console", "OF.Infrasructure.Console\OF.Infrastructure.Console.csproj", "{939121B1-DD65-48EB-A61A-B6953572CE38}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OF.Infrastructure.Console", "OF.Infrastructure.Console\OF.Infrastructure.Console.csproj", "{939121B1-DD65-48EB-A61A-B6953572CE38}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OF.Infrastructure.Data", "OF.Infrastructure.Data\OF.Infrastructure.Data.csproj", "{A252DBD0-5B68-4798-8F1B-9D9DF47291A1}"
 EndProject

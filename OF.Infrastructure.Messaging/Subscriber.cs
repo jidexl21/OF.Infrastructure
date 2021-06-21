@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,14 +10,12 @@ using RabbitMQ.Client.Events;
 
 namespace OF.Infrastructure.Messaging
 {
-    public class Subscriber : ISubscriber
+    public class Subscriber :  ISubscriber
     {
         private IConnection _connection;
-        private IModel _channel; 
-        public Subscriber()
-        {
+        private IModel _channel;
+        private CancellationToken cancellationToken;
 
-        }
         public virtual async Task<(IConnection, IModel)> Connect() {
             await Task.Run(() => {
                 // CloudAMQP URL in format amqp://user:pass@hostName:port/vhost
@@ -33,13 +32,19 @@ namespace OF.Infrastructure.Messaging
 
             return (_connection, _channel);
         }
-        public Task ListenAsync(CancellationToken token)
+        public async Task ListenAsync(CancellationToken token)
         {
-            while (!token.IsCancellationRequested) { 
-            
-            
-            }
-            
+            cancellationToken = token;
+            await Task.Run(() => {
+
+                while (!token.IsCancellationRequested)
+                {
+                    Console.WriteLine($"Consuming from queue {}");
+                    var c = new Consumer("queue1");
+                    c.ConsumeQueue();
+                    Task.Delay(2000).Wait();
+                }
+            });
         }
     }
 
@@ -48,11 +53,15 @@ namespace OF.Infrastructure.Messaging
         private IConnection _connection;
         private IModel _channel;
         private ManualResetEvent _resetEvent = new ManualResetEvent(false);
-
+        private readonly string topic; 
+        public Consumer(string topic)
+        {
+            this.topic = topic;
+        }
         public void ConsumeQueue()
         {
             // CloudAMQP URL in format amqp://user:pass@hostName:port/vhost
-            string _url = "amqp://guest:guest@localhost/%2f";
+            string url = Environment.GetEnvironmentVariable("ampqhost");
             // create a connection and open a channel, dispose them when done
             var factory = new ConnectionFactory
             {
