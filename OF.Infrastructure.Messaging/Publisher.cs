@@ -6,13 +6,16 @@ using System.Threading.Tasks;
 namespace OF.Infrastructure.Messaging
 {
 
-    public class Publisher
+    public class Publisher : IPublisher
     {
         private readonly ConnectionFactory connectionFactory;
         public Publisher(ConnectionFactory connectionFactory)
         {
             this.connectionFactory = connectionFactory;
         }
+        /// <summary>
+        /// requires a environment variable set as ampqhost to contain the connection string
+        /// </summary>
         public Publisher()
         {
             string env  = Environment.GetEnvironmentVariable("ampqhost");

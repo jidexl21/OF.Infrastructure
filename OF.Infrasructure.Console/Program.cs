@@ -7,7 +7,7 @@ namespace OF.Infrasructure.Console
     {
         static void Main(string[] args)
         {
-            Environment.SetEnvironmentVariable("ampqhost", "amqps://iyythvmo:NX9LyVB0ZwiNbpzmryps9by9FgDXIyP3@shrimp.rmq.cloudamqp.com/iyythvmo");
+            Environment.SetEnvironmentVariable("ampqhost", "");
             var x = new Publisher();
             var message = new QueueMessage {
                 Topic = "sample-topic",
