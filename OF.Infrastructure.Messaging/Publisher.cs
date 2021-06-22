@@ -35,7 +35,7 @@ namespace OF.Infrastructure.Messaging
                                              routingKey: "",
                                              basicProperties: null,
                                              body: body);
-                        Console.WriteLine(" [x] Sent {0}", message.Message);
+                        Console.WriteLine(" [x] Sent {0} to Topic {1}", message.Message, message.Topic);
                     }
                 }
 

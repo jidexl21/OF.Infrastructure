@@ -1,23 +1,42 @@
-﻿using System;
+﻿using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 
 
 namespace OF.Infrastructure.Messaging
 {
-    public class Subscriber :  ISubscriber
+    public class Subscriber : ISubscriber
     {
         private IConnection _connection;
         private IModel _channel;
         private CancellationToken cancellationToken;
+        private string[] topics;
+        private readonly ConnectionFactory connectionFactory;
 
-        public virtual async Task<(IConnection, IModel)> Connect() {
-            await Task.Run(() => {
+        public Subscriber(IEnumerable<string> topics)
+        {
+            this.topics = topics.ToArray();
+            // CloudAMQP URL in format amqp://user:pass@hostName:port/vhost
+            string url = Environment.GetEnvironmentVariable("ampqhost");
+            // create a connection and open a channel, dispose them when done
+            connectionFactory = new ConnectionFactory
+            {
+                Uri = new Uri(url)
+            };
+            var connectionTask = Connect();
+            connectionTask.Wait();
+            _connection = connectionTask.Result.Item1;
+            _channel = connectionTask.Result.Item2;
+        }
+        public virtual async Task<(IConnection, IModel)> Connect()
+        {
+            await Task.Run(() =>
+            {
                 // CloudAMQP URL in format amqp://user:pass@hostName:port/vhost
                 string url = Environment.GetEnvironmentVariable("ampqhost");
                 // create a connection and open a channel, dispose them when done
@@ -32,16 +51,21 @@ namespace OF.Infrastructure.Messaging
 
             return (_connection, _channel);
         }
-        public async Task ListenAsync(CancellationToken token)
+        public async Task ListenAsync(CancellationToken token=new CancellationToken())
         {
             cancellationToken = token;
-            await Task.Run(() => {
+            Console.WriteLine($"Listening on topics: {string.Join(",",topics)}");
+            await Task.Run(() =>
+            {
 
                 while (!token.IsCancellationRequested)
                 {
-                    Console.WriteLine($"Consuming from queue {}");
-                    var c = new Consumer("queue1");
-                    c.ConsumeQueue();
+                    var tasks = topics.Select(x =>
+                    {
+                        var c = new Consumer(x, connectionFactory);
+                        return Task.Run(() => c.ConsumeQueue());
+                    });
+                    Task.WaitAll(tasks.ToArray(), token);
                     Task.Delay(2000).Wait();
                 }
             });
@@ -53,26 +77,21 @@ namespace OF.Infrastructure.Messaging
         private IConnection _connection;
         private IModel _channel;
         private ManualResetEvent _resetEvent = new ManualResetEvent(false);
-        private readonly string topic; 
-        public Consumer(string topic)
+        private readonly string topic;
+        private readonly ConnectionFactory connectionFactory;
+        public Consumer(string topic, ConnectionFactory connectionFactory)
         {
             this.topic = topic;
+            this.connectionFactory = connectionFactory;
         }
         public void ConsumeQueue()
         {
-            // CloudAMQP URL in format amqp://user:pass@hostName:port/vhost
-            string url = Environment.GetEnvironmentVariable("ampqhost");
-            // create a connection and open a channel, dispose them when done
-            var factory = new ConnectionFactory
-            {
-                Uri = new Uri(url)
-            };
 
-            _connection = factory.CreateConnection();
+            _connection = connectionFactory.CreateConnection();
             _channel = _connection.CreateModel();
 
             // ensure that the queue exists before we access it
-            var queueName = "queue1";
+            var queueName = topic;
             bool durable = false;
             bool exclusive = false;
             bool autoDelete = true;
@@ -80,7 +99,7 @@ namespace OF.Infrastructure.Messaging
             _channel.QueueDeclare(queueName, durable, exclusive, autoDelete, null);
 
             var consumer = new EventingBasicConsumer(_channel);
-
+            Console.WriteLine("Trying...");
             // add the message receive event
             consumer.Received += (model, deliveryEventArgs) =>
             {
