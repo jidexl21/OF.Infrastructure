@@ -18,12 +18,12 @@ namespace OF.Infrastructure.Messaging.RabbitMQ
         private readonly IMediator _mediator;
         private readonly Dictionary<string, List<Type>> _handlers;
         private readonly List<Type> _eventTypes;
-
-        public RabbitMQBus(IMediator mediator)
+        private readonly Uri _uri;
+        public RabbitMQBus(IMediator mediator, Dictionary<string, string> ampqConfig)
         {
             _mediator = mediator;
             _handlers = new Dictionary<string, List<Type>>();
-
+            _uri = new Uri(ampqConfig["ampqhost"]);
             _eventTypes = new List<Type>(); 
         }
 
@@ -71,7 +71,7 @@ namespace OF.Infrastructure.Messaging.RabbitMQ
 
         private void StartBasicConsume<T>() where T : Event
         {
-            Uri _uri = new Uri(Environment.GetEnvironmentVariable("ampqhost"));
+            
             var factory = new ConnectionFactory() { Uri = _uri, 
                 DispatchConsumersAsync = true
             };
@@ -91,8 +91,8 @@ namespace OF.Infrastructure.Messaging.RabbitMQ
             try {
                 await ProcessEvent(eventName, message).ConfigureAwait(false);
             }
-            catch { 
-            
+            catch (Exception exc){ 
+                
             }
         }
 
