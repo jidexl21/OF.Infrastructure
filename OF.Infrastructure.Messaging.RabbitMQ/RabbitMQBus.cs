@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿//using MediatR;
 using Newtonsoft.Json;
 using OF.Infrastructure.Messaging.Bus;
 using OF.Infrastructure.Messaging.Commands;
@@ -15,22 +15,21 @@ namespace OF.Infrastructure.Messaging.RabbitMQ
 {
     public sealed class RabbitMQBus : IEventBus
     {
-        private readonly IMediator _mediator;
+
         private readonly Dictionary<string, List<Type>> _handlers;
         private readonly List<Type> _eventTypes;
-        private readonly Uri _uri;
-        public RabbitMQBus(IMediator mediator, Dictionary<string, string> ampqConfig)
+        private readonly ConnectionFactory factory;
+        public RabbitMQBus(ConnectionFactory factory)
         {
-            _mediator = mediator;
             _handlers = new Dictionary<string, List<Type>>();
-            _uri = new Uri(ampqConfig["ampqhost"]);
-            _eventTypes = new List<Type>(); 
+            _eventTypes = new List<Type>();
+            this.factory = factory;
         }
 
         public void Publish<T>(T @event) where T : Event
         {
-            Uri _url = new Uri(Environment.GetEnvironmentVariable("ampqhost"));
-            var factory = new ConnectionFactory() { Uri = _url };
+            //Uri _url = new Uri(Environment.GetEnvironmentVariable("ampqhost"));
+            //var factory = new ConnectionFactory() { Uri = _url };
             using (var connection = factory.CreateConnection())
             {
                 using(var channel = connection.CreateModel())
@@ -39,14 +38,15 @@ namespace OF.Infrastructure.Messaging.RabbitMQ
                     channel.QueueDeclare(eventName, false, false, false, null);
                     var message = JsonConvert.SerializeObject(@event);
                     var body = Encoding.UTF8.GetBytes(message);
-                    channel.BasicPublish("", eventName, null, body);
+                    channel.BasicPublish("", eventName, true, null, body);
                 }
             }
         }
 
         public Task SendCommand<T>(T Command) where T : Command
         {
-            return _mediator.Send(Command);
+            //return _mediator.Send(Command);
+            throw new NotImplementedException();
         }
 
         public void Subscribe<T, TH>()
@@ -71,10 +71,8 @@ namespace OF.Infrastructure.Messaging.RabbitMQ
 
         private void StartBasicConsume<T>() where T : Event
         {
-            
-            var factory = new ConnectionFactory() { Uri = _uri, 
-                DispatchConsumersAsync = true
-            };
+
+            factory.DispatchConsumersAsync = true;
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
             var eventName = typeof(T).Name;
@@ -91,8 +89,8 @@ namespace OF.Infrastructure.Messaging.RabbitMQ
             try {
                 await ProcessEvent(eventName, message).ConfigureAwait(false);
             }
-            catch (Exception exc){ 
-                
+            catch (Exception exc){
+                Console.WriteLine(exc.Message); 
             }
         }
 

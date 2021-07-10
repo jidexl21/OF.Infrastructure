@@ -18,16 +18,17 @@ namespace OF.Infrastructure.Messaging
         private string[] topics;
         private readonly ConnectionFactory connectionFactory;
 
-        public Subscriber(IEnumerable<string> topics)
+        public Subscriber(IEnumerable<string> topics, ConnectionFactory connectionFactory)
         {
             this.topics = topics.ToArray();
             // CloudAMQP URL in format amqp://user:pass@hostName:port/vhost
-            string url = Environment.GetEnvironmentVariable("ampqhost");
+            //string url = Environment.GetEnvironmentVariable("ampqhost");
+            this.connectionFactory = connectionFactory;
             // create a connection and open a channel, dispose them when done
-            connectionFactory = new ConnectionFactory
-            {
-                Uri = new Uri(url)
-            };
+            //connectionFactory = new ConnectionFactory
+            //{
+            //    Uri = new Uri(url)
+            //};
             var connectionTask = Connect();
             connectionTask.Wait();
             _connection = connectionTask.Result.Item1;
@@ -40,10 +41,7 @@ namespace OF.Infrastructure.Messaging
                 // CloudAMQP URL in format amqp://user:pass@hostName:port/vhost
                 string url = Environment.GetEnvironmentVariable("ampqhost");
                 // create a connection and open a channel, dispose them when done
-                var factory = new ConnectionFactory
-                {
-                    Uri = new Uri(url)
-                };
+                var factory = connectionFactory;
 
                 _connection = factory.CreateConnection();
                 _channel = _connection.CreateModel();
@@ -63,6 +61,7 @@ namespace OF.Infrastructure.Messaging
                     var tasks = topics.Select(x =>
                     {
                         var c = new Consumer(x, connectionFactory);
+                        //new EventingBasicConsumer(_channel); 
                         return Task.Run(() => c.ConsumeQueue());
                     });
                     Task.WaitAll(tasks.ToArray(), token);
@@ -94,9 +93,15 @@ namespace OF.Infrastructure.Messaging
             var queueName = topic;
             bool durable = false;
             bool exclusive = false;
-            bool autoDelete = true;
+            bool autoDelete = false;
+            try
+            {
+                _channel.QueueDeclare(queueName, durable, exclusive, autoDelete, null);
+            }
+            catch (Exception e) {
+                Console.WriteLine(e.Message);
+            }
 
-            _channel.QueueDeclare(queueName, durable, exclusive, autoDelete, null);
 
             var consumer = new EventingBasicConsumer(_channel);
             Console.WriteLine("Trying...");

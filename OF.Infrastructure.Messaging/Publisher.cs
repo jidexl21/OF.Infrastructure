@@ -24,22 +24,26 @@ namespace OF.Infrastructure.Messaging
         }
         public async Task<bool> PublishAsync(IQueueMessage message)
         {
-            await Task.Run(() => {
-                using (var connection = connectionFactory.CreateConnection())
+            //await Task.Run(() =>
+            //{
+            using (var connection = connectionFactory.CreateConnection()) {
+                using (var channel = connection.CreateModel())
                 {
-                    using (var channel = connection.CreateModel())
-                    {
-                        channel.ExchangeDeclare(exchange: message.Topic, type: ExchangeType.Fanout);
-                        var body = Encoding.UTF8.GetBytes(message.Message);
-                        channel.BasicPublish(exchange: message.Topic,
-                                             routingKey: "",
-                                             basicProperties: null,
-                                             body: body);
-                        Console.WriteLine(" [x] Sent {0} to Topic {1}", message.Message, message.Topic);
-                    }
+                    //channel.ExchangeDeclare(exchange: message.Topic, type: ExchangeType.Fanout);
+                    channel.QueueDeclare(message.Topic, false, false, false, null);
+                    var body = Encoding.UTF8.GetBytes(message.Message);
+                    channel.BasicPublish(exchange: "",
+                                         routingKey: message.Topic,
+                                         mandatory: true,
+                                         basicProperties: null,
+                                         body: body);
+                    Console.WriteLine(" [x] Sent {0} to Topic {1}", message.Message, message.Topic);
                 }
 
-            });
+            }
+                
+
+            //});
             return true;
 
         }
