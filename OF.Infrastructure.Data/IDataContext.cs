@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 
 namespace OF.Infrastructure.Data
 {
@@ -10,5 +9,13 @@ namespace OF.Infrastructure.Data
         IDbConnection Connection { get; }
         IDbTransaction Transaction { get; }
         bool SaveChanges();
+        Dialect SqlDialect { get; }
+    }
+
+    public enum Dialect
+    {
+        MSSQL,
+        MySql,
+        Oracle
     }
 }

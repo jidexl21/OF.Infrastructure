@@ -1,19 +1,20 @@
 ﻿
 using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Text;
+
 
 namespace OF.Infrastructure.Data
 {
+    
     public enum Driver
     {
-        MSSQL, MySql
+        MSSQL, MySql, Oracle
     }
     public class AdoNetContext : IDataContext, IDisposable
     {
+        private readonly Driver dialect;
         private IDbConnection connection;
         private bool ownsConnection;
         private IDbTransaction transaction;
@@ -21,6 +22,7 @@ namespace OF.Infrastructure.Data
         public AdoNetContext(string connectionString, bool ownsConnection)
         {
             this.connection = new SqlConnection(connectionString);
+            dialect = Driver.MSSQL;
             this.connection.Open();
             this.ownsConnection = ownsConnection;
             this.transaction = this.connection.BeginTransaction();
@@ -28,10 +30,12 @@ namespace OF.Infrastructure.Data
 
         public AdoNetContext(string connectionString, bool ownsConnection, Driver driver)
         {
+            dialect = driver;
             this.connection = GetConnection(connectionString, driver);
             this.connection.Open();
             this.ownsConnection = ownsConnection;
             this.transaction = this.connection.BeginTransaction();
+           
         }
 
 
@@ -57,6 +61,8 @@ namespace OF.Infrastructure.Data
 
         public IDbConnection Connection { get { return this.connection; } }
         public IDbTransaction Transaction { get { return this.transaction; } }
+
+        public Dialect SqlDialect => (Dialect) Enum.Parse(typeof(Dialect), dialect.ToString(), true);
 
         public bool SaveChanges()
         {
