@@ -12,11 +12,11 @@ namespace OF.Infrastructure.Auth
 
     public static class Extensions
     {
-        public static string GenerateJWT(this AppUser user, string SecretKey, int tokenMinutes)
+        public static string GenerateJWT(this IAppUser user, string SecretKey, int tokenMinutes)
         {
             return GenerateJWT(user.ID.ToString(), SecretKey, tokenMinutes);
         }
-        public static string GenerateJWT(this AppUser user, string AppID, string SecretKey, int tokenMinutes)
+        public static string GenerateJWT(this IAppUser user, string AppID, string SecretKey, int tokenMinutes)
         {
             var session = new Dictionary<string, object>();
             session.Add("id", user.ID);
