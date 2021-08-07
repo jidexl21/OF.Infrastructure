@@ -35,7 +35,8 @@ namespace OF.Infrastructure.Auth
         {
             if (!filterContext.HttpContext.Items.ContainsKey("User"))
             {
-                filterContext.Result = new ContentResult() { Content = "Request is not authorized. Login required", StatusCode = (int)HttpStatusCode.Unauthorized }; ;
+                filterContext.Result = new ContentResult() { Content = "Request is not authorized. Login required", StatusCode = (int)HttpStatusCode.Unauthorized }; 
+                return;
             }
             var usr = (AppUser)filterContext.HttpContext.Items["User"];
 
