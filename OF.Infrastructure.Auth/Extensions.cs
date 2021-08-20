@@ -21,7 +21,8 @@ namespace OF.Infrastructure.Auth
             var session = new Dictionary<string, object>();
             session.Add("id", user.ID);
             session.Add("appId", AppID);
-            session.Add("roles", string.Join(",", user.UserRoles.Select(x=>x.Code)));
+            var rlist = (user.UserRoles == null) ? new List<Role>() : user.UserRoles;
+            session.Add("roles", string.Join(",", rlist.Select(x=>x.Code)));
             return GenerateJWT(session, SecretKey, tokenMinutes);
         }
 

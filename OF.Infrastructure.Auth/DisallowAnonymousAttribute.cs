@@ -38,7 +38,7 @@ namespace OF.Infrastructure.Auth
                 filterContext.Result = new ContentResult() { Content = "Request is not authorized. Login required", StatusCode = (int)HttpStatusCode.Unauthorized }; 
                 return;
             }
-            var usr = (AppUser)filterContext.HttpContext.Items["User"];
+            var usr = (AppUser) filterContext.HttpContext.Items["User"];
 
             bool hsrole = (usr.UserRoles.Select(x => x.Code).Intersect(requiredRoles.Distinct()).ToList().Distinct().Count() == requiredRoles.Length);
 
