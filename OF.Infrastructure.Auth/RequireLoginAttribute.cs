@@ -9,7 +9,7 @@ using System.Text;
 
 namespace OF.Infrastructure.Auth
 {
-    class RequireLoginAttribute : ActionFilterAttribute
+    public class RequireLoginAttribute : ActionFilterAttribute
     {
         private readonly string[] requiredRoles;
         /// <summary>
