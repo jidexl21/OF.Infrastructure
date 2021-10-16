@@ -9,9 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OF.Infrastructure.Console",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OF.Infrastructure.Data", "OF.Infrastructure.Data\OF.Infrastructure.Data.csproj", "{A252DBD0-5B68-4798-8F1B-9D9DF47291A1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OF.Infrastructure.Messaging.RabbitMQ", "OF.Infrastructure.Messaging.RabbitMQ\OF.Infrastructure.Messaging.RabbitMQ.csproj", "{4A89ECE3-7379-42BE-8243-675F457CCD43}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OF.Infrastructure.Auth", "OF.Infrastructure.Auth\OF.Infrastructure.Auth.csproj", "{07F9CBED-04A4-47CB-B401-86186CE3D8BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OF.Infrastructure.Auth", "OF.Infrastructure.Auth\OF.Infrastructure.Auth.csproj", "{07F9CBED-04A4-47CB-B401-86186CE3D8BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,10 +29,6 @@ Global
 		{A252DBD0-5B68-4798-8F1B-9D9DF47291A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A252DBD0-5B68-4798-8F1B-9D9DF47291A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A252DBD0-5B68-4798-8F1B-9D9DF47291A1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4A89ECE3-7379-42BE-8243-675F457CCD43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4A89ECE3-7379-42BE-8243-675F457CCD43}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4A89ECE3-7379-42BE-8243-675F457CCD43}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4A89ECE3-7379-42BE-8243-675F457CCD43}.Release|Any CPU.Build.0 = Release|Any CPU
 		{07F9CBED-04A4-47CB-B401-86186CE3D8BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{07F9CBED-04A4-47CB-B401-86186CE3D8BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07F9CBED-04A4-47CB-B401-86186CE3D8BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
