@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using OF.Infrastructure.Auth.Services;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace OF.Infrastructure.Auth
         /// </summary>
         /// <param name="userService"></param>
         /// <param name="appSettings"></param>
-        public JwtMiddleware(IUserService userService, AppSettings appSettings)
+        public JwtMiddleware(IAuthUserService userService, IAuthSettings appSettings)
         {
             //_next = next;
             //_appSettings = appSettings.Value;
@@ -41,7 +42,7 @@ namespace OF.Infrastructure.Auth
         /// <returns></returns>
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            string token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(new string[] { " " }, StringSplitOptions.None).Last();
 
             if (token != null)
                 await attachUserToContext(context, userService, token);
@@ -49,7 +50,7 @@ namespace OF.Infrastructure.Auth
             await next(context);
         }
 
-        private async Task attachUserToContext(HttpContext context, IUserService userService, string token)
+        private async Task attachUserToContext(HttpContext context, IAuthUserService userService, string token)
         {
             try
             {
