@@ -44,9 +44,11 @@ namespace OF.Infrastructure.Auth
         {
             string token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(new string[] { " " }, StringSplitOptions.None).Last();
 
-            if (token != null)
-                await attachUserToContext(context, userService, token);
-
+            if (token != null) {
+                var parts = token.Split(new char[] { '.' });
+                if (parts.Length == 1) { await attachServiceUserToContext(context, userService, token); }
+                else await attachUserToContext(context, userService, token);
+            }
             await next(context);
         }
 
@@ -71,7 +73,22 @@ namespace OF.Infrastructure.Auth
                 // attach user to context on successful jwt validation
                 context.Items["User"] = await userService.GetById(userId);
             }
-            catch
+            catch( Exception ex)
+            {
+                // do nothing if jwt validation fails
+                // user is not attached to context so request won't have access to secure routes
+            }
+        }
+
+        private async Task attachServiceUserToContext(HttpContext context, IAuthUserService userService, string token)
+        {
+            try
+            {
+                var usr = await userService.GetByToken(token);
+                if (token == null) { return;  }
+                context.Items["User"] = usr;
+            }
+            catch (Exception ex)
             {
                 // do nothing if jwt validation fails
                 // user is not attached to context so request won't have access to secure routes
