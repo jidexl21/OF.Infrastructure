@@ -42,7 +42,7 @@ namespace OF.Infrastructure.Auth
 
             bool hsrole = (usr.UserRoles.Intersect(requiredRoles.Distinct()).ToList().Distinct().Count() == requiredRoles.Length);
 
-            if (!hsrole) { filterContext.Result = new ContentResult() { Content = "Insufficent Permissions", StatusCode = (int)HttpStatusCode.Unauthorized }; };
+            if (!hsrole) { filterContext.Result = new ContentResult() { Content = "Insufficent Permissions", StatusCode = (int)HttpStatusCode.Forbidden }; };
         }
     }
 
