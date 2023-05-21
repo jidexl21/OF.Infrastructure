@@ -87,15 +87,14 @@ namespace OF.Infrastructure.Messaging.RabbitMQ
                     connection = SubscriptionChannels[eventName];
                 }
 
-                //using (var channel = connection.CreateModel())
-                //{
-                    var channel = connection.CreateModel();
+                using (var channel = connection.CreateModel())
+                {
                     channel.QueueDeclare(eventName, false, false, false, null);
                     var consumer = new AsyncEventingBasicConsumer(channel);
                     consumer.Received += Consumer_Received;
                     channel.BasicConsume(eventName, true, consumer);
                     Task.Delay(TimeSpan.FromSeconds(10));
-                //};
+                };
 
 
             }
