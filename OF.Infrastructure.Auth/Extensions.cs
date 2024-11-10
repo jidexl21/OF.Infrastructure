@@ -26,6 +26,21 @@ namespace OF.Infrastructure.Auth
             return GenerateJWT(session, SecretKey, tokenMinutes);
         }
 
+
+        public static string GenerateJWT(this IAppUser user, string AppID, string SecretKey, int tokenMinutes, Dictionary<string, object> items)
+        {
+            var session = new Dictionary<string, object>();
+            session.Add("id", user.ID);
+            session.Add("appId", AppID);
+            var rlist = (user.UserRoles == null) ? new List<Role>() : user.UserRoles;
+            session.Add("roles", string.Join(",", rlist.Select(x => x.Code)));
+            foreach (var curr in items) {
+                if (session.Keys.Contains(curr.Key)) {  continue; }
+                session.Add(curr.Key, curr.Value);
+            }
+            return GenerateJWT(session, SecretKey, tokenMinutes);
+        }
+
         public static string Base64Encode(this string plainText)
         {
             var plainTextBytes = Encoding.GetEncoding(28591).GetBytes(plainText);
