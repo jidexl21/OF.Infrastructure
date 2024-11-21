@@ -85,9 +85,11 @@ namespace OF.Infrastructure.Data
         }
 
         public IDbConnection Connection { get { return this.connection; } }
+
         public IDbTransaction Transaction { get { return this.transaction; } }
 
         public Dialect SqlDialect => (Dialect) Enum.Parse(typeof(Dialect), dialect.ToString(), true);
+
 
         public bool SaveChanges()
         {

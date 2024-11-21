@@ -9,6 +9,8 @@ namespace OF.Infrastructure.Data
         IDbConnection Connection { get; }
         IDbTransaction Transaction { get; }
         bool SaveChanges();
+
+        IDbConnection GetConnection();
         Dialect SqlDialect { get; }
     }
 
