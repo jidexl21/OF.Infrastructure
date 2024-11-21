@@ -16,9 +16,21 @@ namespace OF.Infrastructure.Data
     {
         private readonly Driver dialect;
         private IDbConnection connection;
+        private readonly IDataContextConfig config;
         private bool ownsConnection;
         private IDbTransaction transaction;
+        private Func<IDataContextConfig, IDbConnection> ConnectionInitializer { get; set; } = null;
 
+        public AdoNetContext(IDataContextConfig dataContextConfig, Func<IDataContextConfig, IDbConnection> InitializeConnection)
+        {
+            this.config = dataContextConfig;
+            this.connection = InitializeConnection(config);
+            this.dialect = config.Dialect;
+            this.ownsConnection = config.OwnConnection;
+            this.ConnectionInitializer = InitializeConnection;
+
+            this.transaction = this.connection.BeginTransaction();
+        }
         public AdoNetContext(string connectionString, bool ownsConnection)
         {
             this.connection = new SqlConnection(connectionString);
@@ -38,19 +50,32 @@ namespace OF.Infrastructure.Data
            
         }
 
-
+        /// <summary>
+        /// returns a new instance of the connection using Initializer if initializer is available
+        /// </summary>
+        /// <returns></returns>
+        public IDbConnection GetConnection() {
+            return GetConnection();
+        }
         private IDbConnection GetConnection(string connectionString, Driver driver)
         {
-            switch (driver)
+            if (ConnectionInitializer != null)
             {
-                case Driver.MySql:
-                    return new MySqlConnection(connectionString);
-                    break;
-                default:
-                    return new SqlConnection(connectionString);
-                    break;
+                connection = ConnectionInitializer(config);
             }
-
+            else
+            {
+                switch (driver)
+                {
+                    case Driver.MySql:
+                        connection = new MySqlConnection(connectionString);
+                        break;
+                    default:
+                        connection = new SqlConnection(connectionString);
+                        break;
+                }
+            }
+            return connection;
         }
         public IDbCommand CreateCommand()
         {
