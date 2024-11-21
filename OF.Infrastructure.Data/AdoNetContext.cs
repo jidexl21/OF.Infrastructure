@@ -38,6 +38,7 @@ namespace OF.Infrastructure.Data
             this.connection = new SqlConnection(connectionString);
             dialect = Driver.MSSQL;
             this.connection.Open();
+            connectionString = this.connection.ConnectionString;
             this.ownsConnection = ownsConnection;
             this.transaction = this.connection.BeginTransaction();
         }
@@ -57,7 +58,7 @@ namespace OF.Infrastructure.Data
         /// </summary>
         /// <returns></returns>
         public IDbConnection GetConnection() {
-            return GetConnection(config., dialect);
+            return GetConnection(connectionString, dialect);
         }
         private IDbConnection GetConnection(string connectionString, Driver driver)
         {
