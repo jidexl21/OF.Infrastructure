@@ -19,6 +19,7 @@ namespace OF.Infrastructure.Data
         private readonly IDataContextConfig config;
         private bool ownsConnection;
         private IDbTransaction transaction;
+        private readonly string connectionString;
         private Func<IDataContextConfig, IDbConnection> ConnectionInitializer { get; set; } = null;
 
         public AdoNetContext(IDataContextConfig dataContextConfig, Func<IDataContextConfig, IDbConnection> InitializeConnection)
@@ -27,6 +28,7 @@ namespace OF.Infrastructure.Data
             this.connection = InitializeConnection(config);
             this.dialect = config.Dialect;
             this.ownsConnection = config.OwnConnection;
+            this.connectionString = config.ConnectionString;
             this.ConnectionInitializer = InitializeConnection;
 
             this.transaction = this.connection.BeginTransaction();
@@ -55,7 +57,7 @@ namespace OF.Infrastructure.Data
         /// </summary>
         /// <returns></returns>
         public IDbConnection GetConnection() {
-            return GetConnection();
+            return GetConnection(config., dialect);
         }
         private IDbConnection GetConnection(string connectionString, Driver driver)
         {
