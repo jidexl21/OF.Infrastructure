@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,10 +11,9 @@ namespace OF.Infrastructure.Data
     {
         public static async Task ForEachAsync<T>(this List<T> list, Func<T, Task> func)
         {
-            foreach (var value in list)
-            {
-                func(value).Wait(10000);
-            }
+            var ls = new ConcurrentBag<T>(list);
+            await Task.WhenAll(ls.Select(x => func(x)));
+            list = ls.ToList();
         }
 
         public static string CreateMD5(this string input)
