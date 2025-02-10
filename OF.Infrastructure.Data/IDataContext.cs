@@ -14,6 +14,18 @@ namespace OF.Infrastructure.Data
         Dialect SqlDialect { get; }
     }
 
+    public interface IDataContext<T>
+    {
+        void Dispose();
+        IDbCommand CreateCommand();
+        IDbConnection Connection { get; }
+        IDbTransaction Transaction { get; }
+        bool SaveChanges();
+        T Client { get; }
+        IDbConnection GetConnection();
+        Dialect SqlDialect { get; }
+    }
+
     public enum Dialect
     {
         MSSQL,
