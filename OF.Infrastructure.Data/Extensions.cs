@@ -47,7 +47,7 @@ namespace OF.Infrastructure.Data
             {
                 return item.GetValue(parentItem).ToString();
             }
-            else if ( item.PropertyType == typeof(DateTime))
+            else if ( item.PropertyType == typeof(DateTime) ||  item.PropertyType == typeof(DateTime?))
             {
                 return ((DateTime) item.GetValue(parentItem)).ToString("yyyy-MM-dd HH:mm:ss");
             }
