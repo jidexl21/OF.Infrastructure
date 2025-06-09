@@ -42,7 +42,19 @@ namespace OF.Infrastructure.Data
         }
 
         public static bool IsCollection(this object item) => item.GetType().GetInterface("IList") != null;
-        public static object GetValueX(this System.Reflection.PropertyInfo item, object parentItem) =>
-            (item.PropertyType.IsEnum) ? item.GetValue(parentItem).ToString() : item.GetValue(parentItem);
+        public static object GetValueX(this System.Reflection.PropertyInfo item, object parentItem){
+            if (item.PropertyType.IsEnum)
+            {
+                return item.GetValue(parentItem).ToString();
+            }
+            else if ( item.PropertyType == typeof(DateTime))
+            {
+                return ((DateTime) item.GetValue(parentItem)).ToString("yyyy-MM-dd HH:mm:ss");
+            }
+            else
+            {
+                return item.GetValue(parentItem);
+            }
+         }
     }
 }
