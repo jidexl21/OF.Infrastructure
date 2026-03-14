@@ -87,7 +87,7 @@ namespace OF.Infrastructure.Data
             return command;
         }
 
-        public IDbConnection Connection { get { return this.connection; } }
+        public IDbConnection Connection { get => ( this.connection == null || this.connection.State == ConnectionState.Closed) ? GetConnection(connectionString, dialect)  :  this.connection;  }
 
         public IDbTransaction Transaction { get { return this.transaction; } }
 
@@ -109,7 +109,7 @@ namespace OF.Infrastructure.Data
         {
             if (this.transaction != null && this.transaction.Connection != null)
             {
-                if (this.Connection.State == ConnectionState.Closed) return;
+                if (this.connection.State == ConnectionState.Closed) return;
                 this.transaction.Rollback();
                 this.transaction = null;
             }
